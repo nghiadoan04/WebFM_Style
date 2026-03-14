@@ -5,32 +5,32 @@
         gap: 5px;
     }
 
-        .quantity-control button {
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 30px;
-            height: 30px;
-            font-size: 18px;
-        }
+    .quantity-control button {
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        font-size: 18px;
+    }
 
-            .quantity-control button:hover {
-                background-color: #e0e0e0;
-            }
+    .quantity-control button:hover {
+        background-color: #e0e0e0;
+    }
 
-        .quantity-control input {
-            width: 50px;
-            text-align: center;
-            font-size: 16px;
-            padding: 5px;
-        }
-
+    .quantity-control input {
+        width: 50px;
+        text-align: center;
+        font-size: 16px;
+        padding: 5px;
+    }
 </style>
 
 <!-- Modal for product details -->
-<div class="modal fade" id="productDetailsModal" tabindex="-1" role="dialog" aria-labelledby="productDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="productDetailsModal" tabindex="-1" role="dialog" aria-labelledby="productDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="productDetailsModalLabel">Chi tiết sản phẩm</h5>
@@ -53,7 +53,8 @@
                                         <div class="tab-content">
                                             <div class="tab-pane active" id="tabs-1" role="tabpanel">
                                                 <div class="product__details__pic__item">
-                                                    <img id="modalProductImage" src="" alt=""> <!-- Image will be set here -->
+                                                    <img id="modalProductImage" src="" alt="">
+                                                    <!-- Image will be set here -->
                                                 </div>
                                             </div>
                                             <!-- Additional tab panes can be added here -->
@@ -79,7 +80,8 @@
                                         <span> - 5 Reviews</span>
                                     </div>
                                     <h3 id="modalProductPrice">Price</h3> <!-- Price will be set here -->
-                                    <p id="modalProductDescription">Description</p> <!-- Description will be set here -->
+                                    <p id="modalProductDescription">Description</p>
+                                    <!-- Description will be set here -->
                                     <div class="product__details__option">
                                         <div class="product__details__option__size">
                                             <span>Size:</span>
@@ -114,6 +116,17 @@
                                 </div>
                             </div>
                         </div>
+                        <hr style="margin: 30px 0;">
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h4 class="mb-4" style="font-weight: bold; text-align: center;">Sản phẩm gợi ý</h4>
+                            </div>
+                        </div>
+
+                        <div class="row product__filter" id="recommendedProduct">
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -133,7 +146,7 @@
                 <div class="footer__about">
                     <div class="footer__logo">
                         <a href="index.html"><img src="~/User/img/logo1.png" width="80px" height="40px" alt=""></a>
-                    </div>                  
+                    </div>
                 </div>
             </div>
             <div class="col-lg-2 offset-lg-1 col-md-3 col-sm-6">
@@ -185,93 +198,126 @@
 <!-- Noty JS -->
 <script src="https://cdn.jsdelivr.net/npm/noty/lib/noty.min.js"></script>
 <script>
-    $(document).ready(function () {
-        $('.add-to-cart').on('click', function (e) {
-            e.preventDefault();
-            var productId = $(this).data('id'); // Get product ID from data attribute
-            $.ajax({
-                url: '@Url.Action("GetProductDetails", "Products")', // Adjust the action and controller as needed
-                type: 'GET',
-                data: { id: productId },
-                success: function (data) {
-                    // Assuming 'data' contains the product details
-                    $('#modalProductImage').attr('src', '/contents/Images/Product/' + data.images[0]); // Set product image (first image)
-                    $('#modalProductName').text(data.name); // Set product name
-                    var formattedPrice = new Intl.NumberFormat('en-US').format(data.price);
-                    $('#modalProductPrice').html(formattedPrice + ' VNĐ');// Set product price
-                    $('#modalProductDescription').text(data.description); // Set product description
-                    $('#modalProductName').text(data.name); // Set product description
-                    $('#productId').val(data.id); // Set product description
+    $(document).on('click', '.add-to-cart', function (e) {
+        e.preventDefault();
+        var productId = $(this).data('id');
 
+        $.ajax({
+            url: '@Url.Action("GetProductDetails", "Products")',
+            type: 'GET',
+            data: { id: productId },
+            success: function (data) {
+                var product = data.product;
 
-                    // Set unique sizes
+                if (product) {
+                    $('#modalProductImage').attr('src', '/contents/Images/Product/' + product.images[0]);
+                    $('#modalProductName').text(product.name);
+
+                    var formattedPrice = new Intl.NumberFormat('en-US').format(product.price);
+                    $('#modalProductPrice').html(formattedPrice + ' VNĐ');
+
+                    $('#modalProductDescription').text(product.description);
+                    $('#productId').val(product.id);
+
+                    $('.product-quantity').val(1);
                     var sizesHtml = '';
-                    var uniqueSizes = new Set(); // Create a Set to track unique sizes
-                    data.sizeColors.forEach(function (sizeColor) {
+                    var uniqueSizes = new Set();
+                    product.sizeColors.forEach(function (sizeColor) {
                         if (!uniqueSizes.has(sizeColor.size.size1)) {
-                            uniqueSizes.add(sizeColor.size.size1); // Add size to the Set
+                            uniqueSizes.add(sizeColor.size.size1);
                             sizesHtml += '<label><input type="radio" name="size" value="' + sizeColor.size.size1 + '">' + sizeColor.size.size1 + '</label>';
                         }
                     });
                     $('#modalProductSizes').html(sizesHtml);
 
-                    // Set unique colors
                     var colorsHtml = '';
-                    var uniqueColors = new Set(); // Create a Set to track unique colors
-                    data.sizeColors.forEach(function (sizeColor) {
+                    var uniqueColors = new Set();
+                    product.sizeColors.forEach(function (sizeColor) {
                         if (!uniqueColors.has(sizeColor.color.color1)) {
-                            uniqueColors.add(sizeColor.color.color1); // Add color to the Set
+                            uniqueColors.add(sizeColor.color.color1);
                             colorsHtml += '<label><input type="radio" name="size" value="' + sizeColor.color.color1 + '">' + sizeColor.color.color1 + '</label>';
-
                         }
                     });
                     $('#modalProductColors').html(colorsHtml);
 
-
-                    // Populate thumbnails
                     var thumbnailsHtml = '';
                     var tabContentHtml = '';
-                    data.images.forEach(function (image, index) {
+                    product.images.forEach(function (image, index) {
                         thumbnailsHtml += `
-                                    <li class="nav-item">
-                                        <a class="nav-link ${index === 0 ? 'active' : ''}" data-toggle="tab" href="#tabs-${index}" role="tab">
-                                                    <div class="product__details__pic__item">
-                                                <img src="/contents/Images/Product/${image}" alt=""> <!-- Image will be set here -->
-                                            </div>
-                                        </a>
-                                    </li>
-                                `;
+                <li class="nav-item">
+                    <a class="nav-link ${index === 0 ? 'active' : ''}" data-toggle="tab" href="#tabs-${index}" role="tab">
+                        <div class="product__details__pic__item">
+                            <img src="/contents/Images/Product/${image}" alt="">
+                        </div>
+                    </a>
+                </li>`;
                         tabContentHtml += `
-                                    <div class="tab-pane ${index === 0 ? 'active' : ''}" id="tabs-${index}" role="tabpanel">
-                                        <div class="product__details__pic__item">
-                                            <img src="/contents/Images/Product/${image}" alt=""> <!-- Image will be set here -->
-                                        </div>
-                                    </div>
-                                `;
+                <div class="tab-pane ${index === 0 ? 'active' : ''}" id="tabs-${index}" role="tabpanel">
+                    <div class="product__details__pic__item">
+                        <img src="/contents/Images/Product/${image}" alt="">
+                    </div>
+                </div>`;
                     });
-                    $('.nav-tabs').html(thumbnailsHtml); // Populate the thumbnails
-                    $('.tab-content').html(tabContentHtml); // Populate the tab content
+                    $('.nav-tabs').html(thumbnailsHtml);
+                    $('.tab-content').html(tabContentHtml);
 
-                    $('#productDetailsModal').modal('show'); // Show the modal
-                },
-                error: function () {
-                    alert('Error loading product details.');
+                    var recommendHtml = '';
+
+                    if (data.relatedProducts && data.relatedProducts.length > 0) {
+                        data.relatedProducts.forEach(function (item) {
+                            var priceRec = new Intl.NumberFormat('en-US').format(item.price);
+                            var imgUrl = '/contents/Images/Product/' + item.imageUrl;
+                            recommendHtml += `
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" style="background-image: url('${imgUrl}'); background-size: cover; background-position: center;">
+                                <ul class="product__hover">
+                                    <li><a href="#"><img src="/User/img/icon/heart.png" alt=""></a></li>
+                                    <li><a href="#"><img src="/User/img/icon/compare.png" alt=""> <span>Compare</span></a></li>
+                                    <li><a href="#"><img src="/User/img/icon/search.png" alt=""></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6>${item.name}</h6>
+                                <a href="#" class="add-to-cart" data-id="${item.id}">+ Xem chi tiết</a>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-o"></i>
+                                </div>
+                                <h5>${priceRec} VNĐ</h5>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                        });
+                    } else {
+                        recommendHtml = '<div class="col-12 text-center"><p>Không có sản phẩm gợi ý nào.</p></div>';
+                    }
+
+                    $('#recommendedProduct').html(recommendHtml);
+
+                    $('#productDetailsModal').modal('show');
                 }
-            });
+            },
+            error: function () {
+                alert('Error loading product details.');
+            }
         });
     });
-    // Khi người dùng chọn size
+
     $(document).on('click', '#modalProductSizes label', function () {
         $('#modalProductSizes label').removeClass('active');
         $(this).addClass('active');
-        $('#selectedSize').val($(this).find('input').val()); // Ghi size được chọn vào input ẩn
+        $('#selectedSize').val($(this).find('input').val()); 
     });
 
-    // Khi người dùng chọn color
     $(document).on('click', '#modalProductColors label', function () {
         $('#modalProductColors label').removeClass('active');
         $(this).addClass('active');
-        $('#selectedColor').val($(this).find('input').val()); // Ghi color được chọn vào input ẩn
+        $('#selectedColor').val($(this).find('input').val()); 
     });
 
 
@@ -284,7 +330,6 @@
         var productId = $('#productId').val();
         var productQuantity = $('.product-quantity').val();
 
-        // Kiểm tra xem người dùng đã chọn kích cỡ và màu sắc chưa
         if (!selectedSize || !selectedColor) {
             new Noty({
                 text: 'Vui lòng chọn kích cỡ và màu sắc trước khi thêm vào giỏ hàng.',

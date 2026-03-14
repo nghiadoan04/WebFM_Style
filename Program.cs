@@ -35,6 +35,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
     });
 
+builder.Services.AddMemoryCache();
+
+builder.Services.AddScoped<IRecommendationService, ContentBasedService>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

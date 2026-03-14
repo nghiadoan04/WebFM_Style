@@ -1,4 +1,4 @@
-﻿@model WebFM_Style.Models.Product
+
 
 @{
     ViewData["Title"] = "Edit";
@@ -11,51 +11,44 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+        <form id="editProductForm" enctype="multipart/form-data">
+            <div class="text-danger"></div>
+            <input type="hidden" name="Id" id="Id" value='@ViewContext.RouteData.Values["id"]' />
             <div class="form-group flex-grow-1 mx-4">
                 <div id="previewImages" class="d-flex flex-wrap gap-2 mb-3">
-                    @foreach (var item in Model.Images)
-                    {
-                        <img src="@Url.Content("~/contents/Images/Product/" + item.Url)" style="width: 200px; height: 200px; border-radius: 20px;" alt="Existing Image">
-                    }
+                    <!-- Images loaded from API -->
                 </div>
-                <label class="control-label">Hình ảnh</label>
+                <label class="control-label">Hình ảnh (Chọn file mới để thay thế hoặc để trống giữ nguyên ảnh cũ)</label>
                 <input type="file" name="images" id="imageUpload" class="form-control-file" onchange="previewFiles(event)" multiple />
             </div>
 
             <div class="form-group">
-                <label asp-for="Name" class="control-label">Tên sản phẩm</label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label class="control-label">Tên sản phẩm</label>
+                <input name="Name" id="Name" class="form-control" required />
             </div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label">Mô tả</label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label class="control-label">Mô tả</label>
+                <input name="Description" id="Description" class="form-control" />
             </div>
             <div class="form-group">
-                <label asp-for="Price" class="control-label">Đơn giá</label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
+                <label class="control-label">Đơn giá</label>
+                <input name="Price" id="Price" type="number" step="any" class="form-control" required />
             </div>
             <div class="form-group">
                 <label>Trạng Thái</label>
-                <select class="form-control" asp-for="Status" placeholder="" required>
-                    <option value="1" selected>Hoạt động</option>
+                <select class="form-control" name="Status" id="Status" required>
+                    <option value="1">Hoạt động</option>
                     <option value="2">Ngừng hoạt động</option>
-
                 </select>
             </div>
             <div class="form-group">
-                <label asp-for="ProductTypeId" class="control-label">Sản phẩm theo loại</label>
-                <select asp-for="ProductTypeId" class="form-control" asp-items="ViewBag.ProductTypeId"></select>
-                <span asp-validation-for="ProductTypeId" class="text-danger"></span>
+                <label class="control-label">Sản phẩm theo loại</label>
+                <select name="ProductTypeId" id="ProductTypeId" class="form-control" asp-items="ViewBag.ProductTypeId" required>
+                </select>
             </div>
             <div class="form-group">
                 <a asp-action="Index" class="btn btn-light">Trở về</a>
-                <button type="submit" class="btn btn-gradient-primary me-2">Sửa</button>
+                <button type="button" onclick="submitEditForm()" class="btn btn-gradient-primary me-2">Lưu thay đổi</button>
             </div>
         </form>
     </div>
@@ -70,6 +63,44 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
+        $(document).ready(function () {
+            loadProductData();
+        });
+
+        function loadProductData() {
+            var id = document.getElementById('Id').value;
+            if (!id) return;
+
+            $.ajax({
+                url: '/api/products/' + id,
+                type: 'GET',
+                success: function (res) {
+                    $('#Name').val(res.name);
+                    $('#Description').val(res.description);
+                    $('#Price').val(res.price);
+                    $('#Status').val(res.status);
+                    
+                    // Note: ViewBag.ProductTypeId still render options from Server, but we set selected by JS:
+                    $('#ProductTypeId').val(res.productTypeId);
+
+                    // Load Images
+                    var previewContainer = document.getElementById("previewImages");
+                    previewContainer.innerHTML = "";
+                    if (res.imageUrls && res.imageUrls.length > 0) {
+                        res.imageUrls.forEach(function (url) {
+                            const img = document.createElement("img");
+                            img.src = '/contents/Images/Product/' + url;
+                            img.style = "width: 200px; height: 200px; border-radius: 20px; margin-right: 10px;";
+                            previewContainer.appendChild(img);
+                        });
+                    }
+                },
+                error: function (err) {
+                    alert('Lỗi tải dữ liệu sản phẩm');
+                }
+            });
+        }
+
         const previewFiles = (event) => {
             const files = event.target.files;
             const previewContainer = document.getElementById("previewImages");
@@ -86,6 +117,36 @@
                 reader.readAsDataURL(file);
             });
         };
-    </script>
 
+        function submitEditForm() {
+            var form = document.getElementById('editProductForm');
+            if(!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            var formData = new FormData(form);
+            var id = document.getElementById('Id').value;
+
+            $.ajax({
+                url: '/api/products/' + id,
+                type: 'PUT',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    alert("Cập nhật sản phẩm thành công!");
+                    window.location.href = '/Admin/product'; // Redirect back
+                },
+                error: function (err) {
+                    console.error('Error:', err);
+                    if(err.responseJSON && err.responseJSON.message) {
+                        alert("Lỗi: " + err.responseJSON.message);
+                    } else {
+                        alert("Có lỗi xảy ra khi sửa sản phẩm.");
+                    }
+                }
+            });
+        }
+    </script>
 }

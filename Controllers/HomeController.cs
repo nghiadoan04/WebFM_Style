@@ -11,18 +11,31 @@ namespace WebFM_Style.Controllers
     {
 
         private FmStyleDbContext _context;
+        private readonly IRecommendationService _recommendationService;
         public INotyfService _notyfService { get; }
-        public HomeController(FmStyleDbContext repo, INotyfService notyfService)
+        public HomeController(FmStyleDbContext repo, INotyfService notyfService, IRecommendationService recommendationService)
         {
             _context = repo;
             _notyfService = notyfService;
+            _recommendationService = recommendationService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var product = await _context.Products.Include(x => x.Images).Include(x => x.ProductSizeColors).ThenInclude(x => x.Color).Where(x => x.Status == 1).ToListAsync();
+            var product = await _context.Products
+                                        .Include(x => x.Images)
+                                        .Include(x => x.ProductSizeColors).ThenInclude(x => x.Color)
+                                        .Where(x => x.Status == 1).ToListAsync();
+
             ViewBag.Collection = await _context.Collections.ToListAsync();
             ViewBag.News = await _context.News.Take(3).ToListAsync();
+
+            var userId = GetCurrentUserId();
+            if (userId.HasValue)
+            {
+                var recommendedProducts = await _recommendationService.GetRecommendedProducts(userId.Value);
+                ViewBag.RecommendedProducts = recommendedProducts;
+            }
             return View(product);
         }
         public IActionResult Contacts()
@@ -68,6 +81,15 @@ namespace WebFM_Style.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        private int? GetCurrentUserId()
+        {
+            var idClaim = User.Claims.FirstOrDefault(c => c.Type == "Id");
+            if (idClaim != null && int.TryParse(idClaim.Value, out int userId))
+            {
+                return userId;
+            }
+            return null;
         }
     }
 }

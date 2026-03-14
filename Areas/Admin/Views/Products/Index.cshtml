@@ -1,15 +1,12 @@
-﻿@using System.Globalization
-@model IEnumerable<WebFM_Style.Models.Product>
-
+@using System.Globalization
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý sản phẩm";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="page-header">
     <h3 style="font-family:Helvetica;" class="page-title"> Quản lý sản phẩm </h3>
     <nav aria-label="breadcrumb">
-
     </nav>
 </div>
 
@@ -22,72 +19,83 @@
             <table class="table">
                 <thead>
                     <tr>
-
-                        <th>
-                           Hình ảnh
-                        </th>   <th>
-                            Tên sản phẩm
-                            @* @Html.DisplayNameFor(model => model.Name) *@
-                        </th>
-                        <th>
-                            Mô tả
-                            @* @Html.DisplayNameFor(model => model.Description) *@
-                        </th>
-                        <th>
-                            Đơn giá
-                            @* @Html.DisplayNameFor(model => model.Price) *@
-                        </th>
-                        <th>
-                            Trạng thái
-                            @* @Html.DisplayNameFor(model => model.Status) *@
-                        </th>
-                        <th>
-                            Sản phẩm theo loại
-                            @* @Html.DisplayNameFor(model => model.ProductType) *@
-                        </th>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Mô tả</th>
+                        <th>Đơn giá</th>
+                        <th>Trạng thái</th>
+                        <th>Loại SP</th>
                         <th></th>
                     </tr>
                 </thead>
-
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                <img src="@Url.Content("~/contents/Images/Product/" + item.Images.FirstOrDefault()?.Url)" style="width: 80px; height: 80px; border-radius: 20px;" alt="" id="output">
-                            </td>  <td>
-                                @Html.DisplayFor(modelItem => item.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Description)
-                            </td>
-                            <td>
-                                @string.Format(new CultureInfo("vi-VN"), "{0:C0}", item.Price)
-                            </td>
-                            @if (item.Status == 1)
-                            {
-                                <td>
-                                    Còn hoạt động
-                                </td>
-                            }
-                            else
-                            {
-                                <td>
-                                    Ngừng hoạt động
-                                </td>
-                            }
-                            <td>
-                                @Html.DisplayFor(modelItem => item.ProductType.Name)
-                            </td>
-                            <td>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="action-icon"> <i class="mdi mdi-eye" style="color:#19b6ff;font-size:25px;"></i>  </a>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="action-icon"> <i class="mdi mdi-square-edit-outline" style="color:#ffd83b;font-size:25px;"></i></a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-icon"> <i class="mdi mdi-delete" style="color:#e75555;font-size:25px;"></i></a>
-                            </td>
-                        </tr>
-                    }
+                <tbody id="productTableBody">
+                    <!-- Data will be loaded here via AJAX -->
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadProducts();
+        });
+
+        function loadProducts() {
+            $.ajax({
+                url: '/api/products',
+                type: 'GET',
+                success: function (res) {
+                    var html = '';
+                    $.each(res, function (index, item) {
+                        var imgUrl = item.imageUrls && item.imageUrls.length > 0
+                            ? '/contents/Images/Product/' + item.imageUrls[0]
+                            : '/contents/Images/Product/default.png'; // fallback if no image
+
+                        var statusText = item.status === 1
+                            ? 'Còn hoạt động' : 'Ngừng hoạt động';
+
+                        var price = item.price ? item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0 ₫';
+
+                        html += `<tr>
+                                    <td><img src="${imgUrl}" style="width: 80px; height: 80px; border-radius: 20px;" alt=""></td>
+                                    <td>${item.name}</td>
+                                    <td>${item.description || ''}</td>
+                                    <td>${price}</td>
+                                    <td>${statusText}</td>
+                                    <td>${item.productTypeName || ''}</td>
+                                    <td>
+                                        <a href="/Admin/Products/Details/${item.id}" class="action-icon"> <i class="mdi mdi-eye" style="color:#19b6ff;font-size:25px;"></i></a>
+                                        <a href="/Admin/Products/Edit/${item.id}" class="action-icon"> <i class="mdi mdi-square-edit-outline" style="color:#ffd83b;font-size:25px;"></i></a>
+                                        <a href="javascript:void(0);" onclick="deleteProduct(${item.id})" class="action-icon"> <i class="mdi mdi-delete" style="color:#e75555;font-size:25px;"></i></a>
+                                    </td>
+                                </tr>`;
+                    });
+                    $('#productTableBody').html(html);
+                },
+                error: function (err) {
+                    console.error('Failed to fetch products', err);
+                    alert("Lỗi không tải được danh sách sản phẩm.");
+                }
+            });
+        }
+
+        function deleteProduct(id) {
+            if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
+                $.ajax({
+                    url: '/api/products/' + id,
+                    type: 'DELETE',
+                    success: function (res) {
+                        alert(res.message || "Xóa sản phẩm thành công!");
+                        loadProducts(); // reload data
+                    },
+                    error: function (err) {
+                        console.error('Failed to delete', err);
+                        alert("Không thể xóa sản phẩm lúc này.");
+                    }
+                });
+            }
+        }
+    </script>
+}
