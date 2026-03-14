@@ -2,6 +2,8 @@
     ViewData["Title"] = "Home Page";
     var collection = ViewBag.Collection as List<Collection>;
     var news = ViewBag.News as List<News>;
+        var recommendedProducts = ViewBag.RecommendedProducts as List<RecommendedProductDTO>;
+    @* Console.WriteLine("Recommended Products Count: " + (recommendedProducts?.Count() ?? 0)); *@
 }
 @model IEnumerable<WebFM_Style.Models.Product>
 <!-- Phần Hero Bắt Đầu -->
@@ -19,7 +21,8 @@
                                 <h6>Bộ Sưu Tập Mùa Hè</h6>
                                 <h2>@item.Name</h2>
                                 <p>
-                                    Nhãn hiệu chuyên biệt tạo ra những sản phẩm xa xỉ thiết yếu. Sản xuất đạo đức với cam kết
+                                    Nhãn hiệu chuyên biệt tạo ra những sản phẩm xa xỉ thiết yếu. Sản xuất đạo đức với cam
+                                    kết
                                     không ngừng về chất lượng tuyệt vời.
                                 </p>
                                 <a href="#" class="primary-btn">Mua ngay <span class="arrow_right"></span></a>
@@ -82,6 +85,57 @@
     </div>
 </section>
 <!-- Phần Banner Kết Thúc -->
+<!-- Recommend Product Begin -->
+@if (User.Identity.IsAuthenticated && recommendedProducts != null && recommendedProducts.Any())
+{
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="filter__controls">
+                        <li class="active" data-filter="*">Sản phẩm bạn có thể thích</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row product__filter">
+
+                @foreach (var item in recommendedProducts)
+                {
+
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="/contents/Images/Product/@item.ImageUrl">
+                                <ul class="product__hover">
+                                    <li><a href="#"><img src="~/User/img/icon/heart.png" alt=""></a></li>
+                                    <li>
+                                        <a href="#"><img src="~/User/img/icon/compare.png" alt=""> <span>Compare</span></a>
+                                    </li>
+                                    <li><a href="#"><img src="~/User/img/icon/search.png" alt=""></a></li>
+                                </ul>
+                            </div>
+
+                            <div class="product__item__text">
+                                <h6>@item.Name</h6>
+                                <a href="" data-id="@item.Id" class="add-to-cart">+ Thêm giỏ hàng</a>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star-o"></i>
+                                </div>
+                                <h5> @string.Format("{0:N0}", @item.Price) VNĐ</h5>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+        </div>
+    </section>
+}
+<!-- Recommend Product End -->
 <!-- Product Section Begin -->
 <section class="product spad">
     <div class="container">
@@ -99,7 +153,8 @@
 
                 <div class="col-lg-4 col-md-6 col-sm-6">
                     <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="/contents/Images/Product/@item.Images.FirstOrDefault()?.Url">
+                        <div class="product__item__pic set-bg"
+                            data-setbg="/contents/Images/Product/@item.Images.FirstOrDefault()?.Url">
                             <ul class="product__hover">
                                 <li><a href="#"><img src="~/User/img/icon/heart.png" alt=""></a></li>
                                 <li>
@@ -204,7 +259,8 @@
                 <div class="instagram__text">
                     <h2>Instagram</h2>
                     <p>
-                        FM Style – Nơi hội tụ những xu hướng thời trang hiện đại, mang đến phong cách trẻ trung và cá tính cho bạn mỗi ngày.
+                        FM Style – Nơi hội tụ những xu hướng thời trang hiện đại, mang đến phong cách trẻ trung và cá
+                        tính cho bạn mỗi ngày.
                     </p>
                     <h3>#Thời_Trang_Nam</h3>
                 </div>
@@ -231,7 +287,7 @@
                     <div class="blog__item">
                         <div class="blog__item__pic set-bg" data-setbg="/contents/Images/News/@item.Images"></div>
                         <div class="blog__item__text">
-                        <h5>@item.Title</h5>
+                            <h5>@item.Title</h5>
                             <a asp-action="BlogDetails" asp-route-id="@item.Id">Đọc thêm</a>
                         </div>
                     </div>
@@ -240,5 +296,3 @@
         </div>
     </div>
 </section>
-
-

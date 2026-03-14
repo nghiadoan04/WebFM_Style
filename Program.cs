@@ -35,6 +35,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
     });
 
+builder.Services.AddMemoryCache();
+
+builder.Services.AddScoped<IRecommendationService, ContentBasedService>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -49,10 +53,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSession();
+
 
 app.UseStaticFiles(new StaticFileOptions()
 {

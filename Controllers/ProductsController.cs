@@ -1,6 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using AspNetCoreHero.ToastNotification.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml.FormulaParsing.Utilities;
@@ -12,11 +13,13 @@ namespace WebFM_Style.Controllers
     public class ProductsController : Controller
     {
         private FmStyleDbContext _context;
+        private readonly IRecommendationService _recommendationService;
         public INotyfService _notyfService { get; }
-        public ProductsController(FmStyleDbContext repo, INotyfService notyfService)
+        public ProductsController(FmStyleDbContext repo, INotyfService notyfService, IRecommendationService recommendationService)
         {
             _context = repo;
             _notyfService = notyfService;
+            _recommendationService = recommendationService;
         }
         public async Task<IActionResult> Index(string? size, string? color, double? minPrice, double? maxPrice, string? sortOrder, string? category, string? search, int pageNumber = 1, int pageSize = 12)
         {
@@ -81,13 +84,49 @@ namespace WebFM_Style.Controllers
             return View(pagedProducts);
         }
 
-        public IActionResult Details(int id)
+public async Task<IActionResult> Details(int id)
         {
-            var product = _context.Products.Include(x => x.Images).FirstOrDefault(p => p.Id == id);
+            var product = await _context.Products
+            .Include(p => p.Images)
+            .Include(p => p.ProductSizeColors).ThenInclude(psc => psc.Size)
+            .Include(p => p.ProductSizeColors).ThenInclude(psc => psc.Color)
+            .Include(p => p.ProductType).ThenInclude(pt => pt.Category)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
+            {
+                _notyfService.Error("Sản phẩm không tồn tại.");
+                return NotFound();
+            }
+
+            var userId = GetCurrentUserId();
+
+            if (userId.HasValue)
+            {
+                var view = new ProductView
+                {
+                    AccountId = userId.Value,
+                    ProductId = id,
+                    ViewTime = DateTime.Now,
+                };
+
+                _context.ProductViews.Add(view);
+                await _context.SaveChangesAsync();
+            }
+
+            // 3. GỌI HÀM GỢI Ý (TF-IDF)
+            // Lấy các sản phẩm có nội dung tương tự sản phẩm hiện tại
+            var relatedProducts = await _recommendationService.GetProductDetailsRecommendations(id);
+            
+            // Truyền sang View bằng ViewBag
+            ViewBag.RelatedProducts = relatedProducts;
+
             return View(product);
         }
 
-        public IActionResult GetProductDetails(int id)
+        // Nếu bạn dùng AJAX để lấy chi tiết sản phẩm, cập nhật cả hàm này
+        [HttpGet]
+        public async Task<IActionResult> GetProductDetails(int id)
         {
             var product = _context.Products
                 .Where(p => p.Id == id)
@@ -112,9 +151,31 @@ namespace WebFM_Style.Controllers
                 return NotFound(new { message = "Sản phẩm không tồn tại" });
             }
 
-            return Ok(product);
-        }
+            var userId = GetCurrentUserId();
 
+            if (userId.HasValue)
+            {
+                var view = new ProductView
+                {
+                    AccountId = userId.Value,
+                    ProductId = id,
+                    ViewTime = DateTime.Now,
+                };
+
+                _context.ProductViews.Add(view);
+                await _context.SaveChangesAsync();
+            }
+
+            // 4. GỌI HÀM GỢI Ý CHO API
+            var relatedProducts = await _recommendationService.GetProductDetailsRecommendations(id);
+
+            // Trả về JSON chứa cả thông tin sản phẩm và list gợi ý
+            return Ok(new 
+            { 
+                product, 
+                relatedProducts 
+            });
+        }
         public async Task<IActionResult> ShoppingCart()
         {
             var makhclaim = User.Claims.FirstOrDefault(c => c.Type == "Id");
@@ -161,6 +222,15 @@ namespace WebFM_Style.Controllers
         {
 
             return View();
+        }
+        private int? GetCurrentUserId()
+        {
+            var idClaim = User.Claims.FirstOrDefault(c => c.Type == "Id");
+            if (idClaim != null && int.TryParse(idClaim.Value, out int userId))
+            {
+                return userId;
+            }
+            return null;
         }
     }
 }
