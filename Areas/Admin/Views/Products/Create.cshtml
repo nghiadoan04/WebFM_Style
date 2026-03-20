@@ -1,0 +1,115 @@
+@model WebFM_Style.Models.Product
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>THÊM</h1>
+
+<h4>Sản phẩm</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="createProductForm" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group flex-grow-1 mx-4">
+                <div id="image-preview">
+                    <div id="preview-container"></div>
+                    <br />
+                    <label class="control-label"> Hình ảnh đại diện</label>
+                    <input type="file" name="fAvatars" id="fAvatars" class="form-control-file" onchange="previewImages(this)" multiple required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Tên sản phẩm</label>
+                <input asp-for="Name" name="Name" id="Name" class="form-control" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Mô tả</label>
+                <input asp-for="Description" name="Description" id="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label">Đơn giá</label>
+                <input asp-for="Price" name="Price" id="Price" type="number" class="form-control" required />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Trạng Thái</label>
+                <select class="form-control" name="Status" id="Status" required>
+                    <option value="1" selected>Hoạt động</option>
+                    <option value="2">Ngừng hoạt động</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductTypeId" class="control-label">Loại sản phẩm</label>
+                <select name="ProductTypeId" id="ProductTypeId" class="form-control" asp-items="ViewBag.ProductTypeId" required></select>
+            </div>
+            <div class="form-group">
+                <button type="button" onclick="submitCreateForm()" class="btn btn-gradient-primary me-2">Thêm mới</button>
+                <a asp-action="Index" class="btn btn-light">Trở về</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function submitCreateForm() {
+            var form = document.getElementById('createProductForm');
+            if(!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            var formData = new FormData(form);
+
+            $.ajax({
+                url: '/api/products',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    alert("Thêm sản phẩm thành công!");
+                    window.location.href = '/Admin/product'; // Redirect back to index
+                },
+                error: function (err) {
+                    console.error('Error:', err);
+                    if(err.responseJSON && err.responseJSON.message) {
+                        alert("Lỗi: " + err.responseJSON.message);
+                    } else {
+                        alert("Có lỗi xảy ra khi thêm sản phẩm.");
+                    }
+                }
+            });
+        }
+    </script>
+}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script>
+    function previewImages(input) {
+        var previewContainer = document.getElementById('preview-container');
+        previewContainer.innerHTML = '';
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = document.createElement('img');
+                    img.setAttribute('src', e.target.result);
+                    img.style.width = '200px';
+                    img.style.height = '200px';
+                    img.style.borderRadius = '20px';
+                    img.style.display = 'block';
+                    previewContainer.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    };
+</script>
