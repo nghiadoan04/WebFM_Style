@@ -1,72 +1,72 @@
-# 👕 AI-based Fashion Product Recommendation System
+# 👕 Hệ thống gợi ý sản phẩm thời trang ứng dụng AI
 
-A full-stack fashion e-commerce web application integrated with an AI-based recommendation system to enhance product discovery and user experience.
-
----
-
-## 🚀 Key Features
-
-- 🔍 Smart product recommendation based on content similarity  
-- 🧠 AI-powered suggestion using TF-IDF and cosine similarity  
-- 🛒 Product browsing, filtering, and order management  
-- 📊 Admin dashboard for sales and order tracking  
+Ứng dụng web thương mại điện tử thời trang full-stack, tích hợp hệ thống gợi ý sản phẩm dựa trên AI nhằm cải thiện trải nghiệm tìm kiếm và khám phá sản phẩm của người dùng.
 
 ---
 
-## 🤖 Recommendation System
+## 🚀 Tính năng chính
 
-![Recommendation](./images/goiy.png)
-
-Implemented a **Content-Based Filtering** approach to recommend relevant products based on product features such as name, category, and description.
-
-- Applied **TF-IDF** to convert textual product data into vector representations  
-- Used **cosine similarity** to measure similarity between products  
-- Generated personalized product suggestions to improve user experience  
+- 🔍 Gợi ý sản phẩm thông minh dựa trên độ tương đồng nội dung  
+- 🧠 Ứng dụng AI với TF-IDF và cosine similarity  
+- 🛒 Duyệt sản phẩm, lọc sản phẩm và quản lý đơn hàng  
+- 📊 Dashboard quản trị theo dõi doanh thu và đơn hàng  
 
 ---
 
-## 🔁 Similar Products
+## 🤖 Hệ thống gợi ý
 
-![Similar](./images/goiy1.png)
+![Gợi ý](./images/goiy.png)
 
-Displayed similar products based on content similarity using the same recommendation pipeline:
+Triển khai phương pháp **Content-Based Filtering** để đề xuất sản phẩm phù hợp dựa trên đặc trưng nội dung như tên, danh mục và mô tả sản phẩm.
+
+- Sử dụng **TF-IDF** để chuyển đổi dữ liệu văn bản thành vector  
+- Áp dụng **cosine similarity** để tính toán độ tương đồng giữa các sản phẩm  
+- Tạo ra các gợi ý sản phẩm phù hợp nhằm nâng cao trải nghiệm người dùng  
+
+---
+
+## 🔁 Sản phẩm tương tự
+
+![Tương tự](./images/goiy1.png)
+
+Hiển thị các sản phẩm tương tự dựa trên pipeline gợi ý:
 
 **TF-IDF → Cosine Similarity → Content-Based Filtering**
 
-- Helps users quickly find related items  
-- Improves product discovery compared to traditional keyword search  
+- Giúp người dùng dễ dàng tìm thấy các sản phẩm liên quan  
+- Cải thiện khả năng khám phá sản phẩm so với tìm kiếm truyền thống  
 
 ---
 
-## 🖥️ Product Interface
+## 🖥️ Giao diện sản phẩm
 
-![Products](./images/phanloai.png)
+![Sản phẩm](./images/phanloai.png)
 
-- Built with **ASP.NET Core MVC + Bootstrap**  
-- Responsive UI for product listing and filtering  
-- Optimized user experience for browsing and searching  
-
----
-
-## 📊 Admin Dashboard
-
-![Dashboard](./images/thongke.png)
-
-- Monitor revenue and order statistics  
-- Visualize system performance and business data  
+- Xây dựng bằng **ASP.NET Core MVC + Bootstrap**  
+- Giao diện responsive cho danh sách và lọc sản phẩm  
+- Tối ưu trải nghiệm duyệt và tìm kiếm  
 
 ---
 
-## 📦 Order Management
+## 📊 Dashboard quản trị
 
-![Orders](./images/donhang.png)
+![Thống kê](./images/thongke.png)
 
-- Manage customer orders and order status  
-- Built with **ASP.NET Core MVC + SQL Server**  
+- Theo dõi doanh thu và số lượng đơn hàng  
+- Hiển thị dữ liệu và hiệu suất hệ thống  
 
 ---
 
-## ⚙️ Tech Stack
+## 📦 Quản lý đơn hàng
+
+![Đơn hàng](./images/donhang.png)
+
+- Quản lý trạng thái và thông tin đơn hàng  
+- Xây dựng bằng **ASP.NET Core MVC + SQL Server**  
+
+---
+
+## ⚙️ Công nghệ sử dụng
 
 - **Backend:** ASP.NET Core MVC  
 - **Frontend:** HTML, CSS, Bootstrap, JavaScript  
@@ -74,7 +74,7 @@ Displayed similar products based on content similarity using the same recommenda
 
 ---
 
-## 🧠 Core Technologies
+## 🧠 Công nghệ cốt lõi
 
 - Content-Based Filtering  
 - TF-IDF (Term Frequency – Inverse Document Frequency)  
@@ -82,8 +82,8 @@ Displayed similar products based on content similarity using the same recommenda
 
 ---
 
-## 📌 Highlights
+## 📌 Điểm nổi bật
 
-- Built a complete **AI-integrated e-commerce system** from scratch  
-- Applied **information retrieval techniques** for real-world recommendation problems  
-- Improved product discovery using **content similarity instead of 
+- Xây dựng hoàn chỉnh hệ thống thương mại điện tử tích hợp AI  
+- Áp dụng các kỹ thuật xử lý văn bản (information retrieval) vào bài toán gợi ý thực tế  
+- Cải thiện khả năng khám phá sản phẩm bằng gợi ý dựa trên độ tương đồng nội dung thay vì tìm kiếm từ khóa truyền thống  
