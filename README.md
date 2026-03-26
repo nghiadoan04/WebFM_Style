@@ -1,27 +1,40 @@
 # 👕 Hệ thống gợi ý sản phẩm thời trang ứng dụng AI
 
-Ứng dụng web thương mại điện tử thời trang full-stack, tích hợp hệ thống gợi ý sản phẩm dựa trên AI nhằm cải thiện trải nghiệm tìm kiếm và khám phá sản phẩm của người dùng.
+Ứng dụng web thương mại điện tử thời trang full-stack, tích hợp hệ thống gợi ý sản phẩm nhằm cải thiện trải nghiệm tìm kiếm và khám phá sản phẩm.  
+Hệ thống sử dụng phương pháp Content-Based Filtering kết hợp với dữ liệu hành vi người dùng để đưa ra gợi ý phù hợp.
 
 ---
 
 ## 🚀 Tính năng chính
 
-- 🔍 Gợi ý sản phẩm thông minh dựa trên độ tương đồng nội dung  
-- 🧠 Ứng dụng AI với TF-IDF và cosine similarity  
+- 🔍 Gợi ý sản phẩm thông minh dựa trên nội dung sản phẩm  
+- 🧠 Ứng dụng TF-IDF và cosine similarity để tính độ tương đồng  
+- 👤 Sử dụng hành vi người dùng (mua hàng, xem sản phẩm) để cá nhân hóa gợi ý  
 - 🛒 Duyệt sản phẩm, lọc sản phẩm và quản lý đơn hàng  
 - 📊 Dashboard quản trị theo dõi doanh thu và đơn hàng  
 
 ---
 
-## 🤖 Hệ thống gợi ý
+## 🤖 Sản phẩm bạn có thể thích
 
 ![Gợi ý](./images/goiy.png)
 
-Triển khai phương pháp **Content-Based Filtering** để đề xuất sản phẩm phù hợp dựa trên đặc trưng nội dung như tên, danh mục và mô tả sản phẩm.
+Hệ thống gợi ý được xây dựng theo hướng **Content-Based Filtering**, kết hợp với hành vi người dùng để tạo ra danh sách sản phẩm phù hợp.
 
-- Sử dụng **TF-IDF** để chuyển đổi dữ liệu văn bản thành vector  
-- Áp dụng **cosine similarity** để tính toán độ tương đồng giữa các sản phẩm  
-- Tạo ra các gợi ý sản phẩm phù hợp nhằm nâng cao trải nghiệm người dùng  
+### 🔄 Quy trình hoạt động:
+
+1. Thu thập **seed products** từ hành vi người dùng:
+   - Sản phẩm đã mua  
+   - Sản phẩm đã xem  
+
+2. Biểu diễn dữ liệu sản phẩm:
+   - Sử dụng **TF-IDF** để chuyển đổi mô tả, danh mục thành vector  
+
+3. Tính toán độ tương đồng:
+   - Áp dụng **cosine similarity** giữa các sản phẩm  
+
+4. Sinh gợi ý:
+   - Lấy các sản phẩm có độ tương đồng cao nhất với seed products  
 
 ---
 
@@ -29,12 +42,11 @@ Triển khai phương pháp **Content-Based Filtering** để đề xuất sản
 
 ![Tương tự](./images/goiy1.png)
 
-Hiển thị các sản phẩm tương tự dựa trên pipeline gợi ý:
+Hiển thị các sản phẩm tương tự dựa trên nội dung của sản phẩm hiện tại:
 
-**TF-IDF → Cosine Similarity → Content-Based Filtering**
-
-- Giúp người dùng dễ dàng tìm thấy các sản phẩm liên quan  
-- Cải thiện khả năng khám phá sản phẩm so với tìm kiếm truyền thống  
+- Sử dụng chính pipeline gợi ý (TF-IDF + Cosine Similarity)  
+- Không phụ thuộc vào hành vi người dùng  
+- Giúp người dùng khám phá nhanh các sản phẩm liên quan  
 
 ---
 
@@ -71,6 +83,7 @@ Hiển thị các sản phẩm tương tự dựa trên pipeline gợi ý:
 - **Backend:** ASP.NET Core MVC  
 - **Frontend:** HTML, CSS, Bootstrap, JavaScript  
 - **Database:** SQL Server  
+- **Machine Learning:** ML.NET (TF-IDF Featurization)  
 
 ---
 
@@ -84,6 +97,15 @@ Hiển thị các sản phẩm tương tự dựa trên pipeline gợi ý:
 
 ## 📌 Điểm nổi bật
 
-- Xây dựng hoàn chỉnh hệ thống thương mại điện tử tích hợp AI  
-- Áp dụng các kỹ thuật xử lý văn bản (information retrieval) vào bài toán gợi ý thực tế  
-- Cải thiện khả năng khám phá sản phẩm bằng gợi ý dựa trên độ tương đồng nội dung thay vì tìm kiếm từ khóa truyền thống  
+- Xây dựng hoàn chỉnh hệ thống thương mại điện tử tích hợp gợi ý sản phẩm  
+- Kết hợp **hành vi người dùng + nội dung sản phẩm** để tăng độ chính xác  
+- Áp dụng kỹ thuật **information retrieval** vào bài toán thực tế  
+- Cải thiện khả năng khám phá sản phẩm so với tìm kiếm truyền thống  
+
+---
+
+## 🚧 Hướng phát triển
+
+- Kết hợp thêm **Collaborative Filtering**  
+- Xây dựng hệ thống gợi ý lai (Hybrid Recommendation System)  
+- Tối ưu hiệu năng và độ chính xác của thuật toán  
