@@ -1,53 +1,89 @@
-# 👕 Hệ thống gợi ý sản phẩm thời trang tích hợp AI
+# 👕 AI-based Fashion Product Recommendation System
 
-Ứng dụng web thương mại điện tử thời trang tích hợp AI, sử dụng các thuật toán phân tích nội dung để gợi ý sản phẩm phù hợp và nâng cao trải nghiệm người dùng.
-
----
-
-## 🤖 Gợi ý sản phẩm
-![Gợi ý](./images/goiy.png)
-
-Sử dụng **Content-Based Filtering** để đề xuất sản phẩm phù hợp dựa trên hành vi người dùng.
+A full-stack fashion e-commerce web application integrated with an AI-based recommendation system to enhance product discovery and user experience.
 
 ---
 
-## 🔁 Sản phẩm tương tự
-![Tương tự](./images/goiy1.png)
+## 🚀 Key Features
 
-Áp dụng **TF-IDF + Cosine Similarity** để tính độ tương đồng giữa các sản phẩm, giúp gợi ý các sản phẩm tương tự.
-
----
-
-## 🖥️ Giao diện sản phẩm
-![Danh sách sản phẩm](./images/phanloai.png)
-
-Xây dựng bằng **ASP.NET Core MVC, Bootstrap**.  
-Phân loại sản phẩm, lọc sản phẩm tối ưu hóa trải nghiệm người dùng
+- 🔍 Smart product recommendation based on content similarity  
+- 🧠 AI-powered suggestion using TF-IDF and cosine similarity  
+- 🛒 Product browsing, filtering, and order management  
+- 📊 Admin dashboard for sales and order tracking  
 
 ---
 
-## 📊 Quản trị hệ thống
-![Thống kê](./images/thongke.png)
+## 🤖 Recommendation System
 
-Xây dựng dashboard bằng **ASP.NET Core MVC**, hiển thị doanh thu và số lượng đơn hàng.
+![Recommendation](./images/goiy.png)
 
----
+Implemented a **Content-Based Filtering** approach to recommend relevant products based on product features such as name, category, and description.
 
-## 📦 Quản lý đơn hàng
-![Đơn hàng](./images/donhang.png)
-
-Quản lý đơn hàng bằng **ASP.NET Core MVC + SQL Server**, hỗ trợ xác nhận và xử lý đơn hàng.
+- Applied **TF-IDF** to convert textual product data into vector representations  
+- Used **cosine similarity** to measure similarity between products  
+- Generated personalized product suggestions to improve user experience  
 
 ---
 
-## ⚙️ Công nghệ
-- ASP.NET Core MVC  
-- SQL Server  
-- HTML, CSS, Bootstrap, JavaScript  
+## 🔁 Similar Products
+
+![Similar](./images/goiy1.png)
+
+Displayed similar products based on content similarity using the same recommendation pipeline:
+
+**TF-IDF → Cosine Similarity → Content-Based Filtering**
+
+- Helps users quickly find related items  
+- Improves product discovery compared to traditional keyword search  
 
 ---
 
-## 🧠 Thuật toán
+## 🖥️ Product Interface
+
+![Products](./images/phanloai.png)
+
+- Built with **ASP.NET Core MVC + Bootstrap**  
+- Responsive UI for product listing and filtering  
+- Optimized user experience for browsing and searching  
+
+---
+
+## 📊 Admin Dashboard
+
+![Dashboard](./images/thongke.png)
+
+- Monitor revenue and order statistics  
+- Visualize system performance and business data  
+
+---
+
+## 📦 Order Management
+
+![Orders](./images/donhang.png)
+
+- Manage customer orders and order status  
+- Built with **ASP.NET Core MVC + SQL Server**  
+
+---
+
+## ⚙️ Tech Stack
+
+- **Backend:** ASP.NET Core MVC  
+- **Frontend:** HTML, CSS, Bootstrap, JavaScript  
+- **Database:** SQL Server  
+
+---
+
+## 🧠 Core Technologies
+
 - Content-Based Filtering  
-- TF-IDF  
+- TF-IDF (Term Frequency – Inverse Document Frequency)  
 - Cosine Similarity  
+
+---
+
+## 📌 Highlights
+
+- Built a complete **AI-integrated e-commerce system** from scratch  
+- Applied **information retrieval techniques** for real-world recommendation problems  
+- Improved product discovery using **content similarity instead of 
