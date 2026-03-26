@@ -57,7 +57,7 @@ public partial class FmStyleDbContext : DbContext
 
     public virtual DbSet<Supplier> Suppliers { get; set; }
     public virtual DbSet<ProductView> ProductViews { get; set; }
-
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer(
             "Server=localhost,1433;Database=FM_Style_DB;User Id=sa;Password=Admin123@!;MultipleActiveResultSets=true;TrustServerCertificate=True;");
